@@ -1,4 +1,4 @@
-import { Specimen, taxonTrail } from "@/lib/specimens";
+import { Specimen, taxonTrail, resolveImageSrc } from "@/lib/specimens";
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
@@ -14,9 +14,17 @@ function Field({ label, value }: { label: string; value: string }) {
 export function SpecimenTag({ specimen }: { specimen: Specimen }) {
   const trail = taxonTrail(specimen.class_phylum);
   const hasNotes = specimen.notes || specimen.sources;
+  const photoSrc = resolveImageSrc(specimen.image);
 
   return (
     <div className="relative border border-border bg-card p-9 shadow-[0_10px_24px_-14px_rgba(36,31,23,0.18)] before:pointer-events-none before:absolute before:inset-3.5 before:border before:border-border">
+      {photoSrc && (
+        <img
+          src={photoSrc}
+          alt={specimen.common_name}
+          className="mb-6 aspect-[4/3] w-full border border-border object-cover"
+        />
+      )}
       <h1 className="font-display text-[clamp(1.9rem,4vw,2.6rem)] font-semibold leading-[1.08] text-foreground">
         {specimen.common_name || `Specimen ${specimen.id}`}
       </h1>
@@ -52,8 +60,6 @@ export function SpecimenTag({ specimen }: { specimen: Specimen }) {
         <Field label="Habitat" value={specimen.habitat} />
         <Field label="Diet" value={specimen.diet} />
         <Field label="Conservation" value={specimen.conservation_status} />
-        <Field label="Collected" value={specimen.collection_date} />
-        <Field label="Location" value={specimen.location} />
       </dl>
 
       {hasNotes && (
