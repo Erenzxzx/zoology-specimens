@@ -1,4 +1,5 @@
 import specimensJson from "@/data/specimens.json";
+import { BASE_PATH } from "@/lib/site-config";
 
 export type Specimen = {
   id: string;
@@ -13,6 +14,11 @@ export type Specimen = {
   conservation_status: string;
   notes: string;
   sources: string;
+  /**
+   * Either a filename living in public/specimens/ (e.g. "001.jpg") or a
+   * full https:// URL. Leave blank until you've photographed the specimen.
+   */
+  image: string;
 };
 
 export const specimens = specimensJson as Specimen[];
@@ -23,6 +29,18 @@ export function getSpecimen(id: string): Specimen | undefined {
 
 export function getAllSpecimenIds(): string[] {
   return specimens.map((s) => s.id);
+}
+
+/**
+ * Resolves a specimen's `image` field into a usable <img src>.
+ * - A full URL (https://...) is used as-is.
+ * - A bare filename (e.g. "001.jpg") is looked up in public/specimens/.
+ * - Blank returns "".
+ */
+export function resolveImageSrc(image: string): string {
+  if (!image) return "";
+  if (/^https?:\/\//i.test(image)) return image;
+  return `${BASE_PATH}/specimens/${image}`;
 }
 
 /**
